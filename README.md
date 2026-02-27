@@ -11,6 +11,7 @@ A local Node.js server for rendering Markdown files with Mermaid diagrams. Featu
 - **Table of Contents** - Auto-generated for documents with multiple headings
 - **Click to Expand** - Fullscreen view for diagrams
 - **Reading Progress** - Shows scroll progress and percentage read
+- **Inline Tooltips** - Add hover/focus explanations for key terms
 
 ## Quick Start
 
@@ -58,6 +59,18 @@ flowchart TD
 ````
 
 All [Mermaid diagram types](https://mermaid.js.org/intro/) are supported.
+
+## Inline Tooltips
+
+You can add tooltips directly in markdown with this syntax:
+
+```markdown
+{{Mandat|Bestillingen fra styret.\nEksempel: "Lag en plan som reduserer frafall i ungdomsfotballen innen oktober."}}
+```
+
+- Hover with mouse, or tab-focus on keyboard, to show the tooltip
+- Use `\n` for line breaks inside the tooltip text
+- Escape `|` as `\|` if needed inside tooltip content
 
 ## Configuration
 

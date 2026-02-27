@@ -67,3 +67,7 @@ const server = http.createServer((req, res) => {
 | Live Reload | Done |
 
 > This is a blockquote to show styling works correctly.
+
+## Tooltip Example
+
+Du kan legge forklaring direkte i teksten: {{Mandat|Bestillingen fra styret.\nEksempel: "Lag en plan som reduserer frafall i ungdomsfotballen innen oktober."}}
