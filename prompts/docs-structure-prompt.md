@@ -15,14 +15,14 @@ Goals:
 Required structure:
 - Put standalone top-level docs first
 - Then put grouped sections after them
-- Top-level pages should be things like `Intro`, `Config`, `Providers`, `Network`
-- Groups should be things like `Usage`, `Configure`, `Develop`
+- Top-level pages should be things like `intro`, `config`, `providers`, `network`
+- Groups should be things like `usage`, `configure`, `develop`
 - If the repository currently has deeper nesting, flatten it into a two-level structure where possible
 
 Naming rules:
 - Use `README.md` for the top-level introduction page
-- Use `Overview` for a section landing page when a grouped section needs one
-- Avoid duplicate patterns like `Intro` and `Overview` for the same section unless absolutely necessary
+- Use `overview` for a section landing page when a grouped section needs one
+- Avoid duplicate patterns like `intro` and `overview` for the same section unless absolutely necessary
 - Keep file and folder names consistent, predictable, and human-readable
 
 Implementation expectations:
@@ -53,9 +53,9 @@ Requirements:
 Conventions:
 - Root introduction page should be named `README.md`
 - Root-level standalone docs should come before grouped sections conceptually
-- Section landing pages should be named `Overview` when needed
+- Section landing pages should be named `overview` when needed
 - A section should not contain both a duplicated intro page and an overview page serving the same purpose
-- Within a section, `Overview` should come first, then the remaining child pages
+- Within a section, `overview` should come first, then the remaining child pages
 
 What to change:
 - Rename files where needed to make labels clean and consistent
@@ -107,8 +107,8 @@ Requirements:
 
 Naming rules:
 - The top-level introduction page should be named `README.md`
-- Section landing pages should be named `Overview` when needed
-- Do not create duplicate `Overview` and intro pages for the same section purpose
+- Section landing pages should be named `overview` when needed
+- Do not create duplicate `overview` and intro pages for the same section purpose
 - Keep naming consistent across sections
 
 Implementation details:
