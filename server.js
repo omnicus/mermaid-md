@@ -394,14 +394,40 @@ const server = http.createServer((req, res) => {
   if (pathname === '/') {
     res.setHeader('Connection', 'close');
     const projects = config.getProjects();
-    res.end(
-      html(
-        `<h1>Mermaid Server</h1><p>Select a project from the sidebar.</p><ul class="file-list">${projects.map((p) => `<li><a href="/p/${p.id}/">📁 <span>${p.name}</span></a></li>`).join('')}</ul>`,
-        'Mermaid Server',
-        null,
-        '',
-      ),
-    );
+    const projectLinks = projects.length
+      ? projects
+          .map(
+            (p) =>
+              `<li><a href="/p/${p.id}/">📁 <span>${p.name}</span></a></li>`,
+          )
+          .join('')
+      : '<li><a href="javascript:void(0)" onclick="showAddProject()">＋ <span>Add your first workspace</span></a></li>';
+    const dashboardContent = `
+      <h1>Intro</h1>
+      <p>Mermaid-MD is a local Markdown docs viewer with Mermaid rendering, search, live reload, and inline editing.</p>
+      <div class="intro-hero">
+        <figure class="terminal-demo">
+          <div class="terminal-demo-header">
+            <span class="terminal-demo-dots"><span></span><span></span><span></span></span>
+            <span>mermaid-md / local docs preview</span>
+          </div>
+          <pre><code>$ npm start
+Mermaid Server running at http://localhost:4000
+
+> open a workspace
+> browse markdown docs
+> render mermaid diagrams instantly
+> edit files inline with live reload</code></pre>
+        </figure>
+      </div>
+      <h2>Get started</h2>
+      <p>Pick a workspace from the sidebar or create a new one, then open any Markdown file to read, search, and edit it in a docs-style layout.</p>
+      <section class="workspace-list">
+        <h2>Workspaces</h2>
+        <ul class="file-list">${projectLinks}</ul>
+      </section>
+    `;
+    res.end(html(dashboardContent, 'Mermaid Server', null, ''));
     return;
   }
 

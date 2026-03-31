@@ -32,6 +32,7 @@ script_only.js
 
 # OpenCode config
 .opencode/
+.firecrawl/
 
 # Project rules (local)
 RULES.md
