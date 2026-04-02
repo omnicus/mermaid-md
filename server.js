@@ -327,6 +327,7 @@ const handleProjectRequest = (res, projectId, subPath, url) => {
           nav,
           readmeFilePath,
           readmeFilePath,
+          fs.statSync(readmePath).mtime,
         ),
       );
     } else {
@@ -362,7 +363,15 @@ const handleProjectRequest = (res, projectId, subPath, url) => {
     const title = getH1Title(content) || path.basename(fullPath);
     const nav = `<div class="back-link"><a href="javascript:history.back()">&larr; Back</a></div>`;
     res.end(
-      html(renderMarkdown(content), title, projectId, nav, subPath, subPath),
+      html(
+        renderMarkdown(content),
+        title,
+        projectId,
+        nav,
+        subPath,
+        subPath,
+        stats.mtime,
+      ),
     );
   } else {
     // Serve static files
