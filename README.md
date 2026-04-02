@@ -153,3 +153,4 @@ Add inline tooltips in Markdown with this syntax:
 ## License
 
 MIT
+

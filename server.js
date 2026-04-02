@@ -6,6 +6,7 @@
  */
 
 const http = require('http');
+const { spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -24,6 +25,109 @@ const {
 } = require('./lib/utils');
 
 const PORT = process.env.PORT || 4000;
+
+const runGitCommand = (args, cwd) => {
+  return spawnSync('git', args, {
+    cwd,
+    encoding: 'utf-8',
+    maxBuffer: 1024 * 1024,
+  });
+};
+
+const getGitRepoRoot = (cwd) => {
+  const result = runGitCommand(['rev-parse', '--show-toplevel'], cwd);
+  if (result.status !== 0) {
+    return null;
+  }
+  return result.stdout.trim() || null;
+};
+
+const getGitFileSnapshot = (projectPath, fullPath) => {
+  const repoRoot = getGitRepoRoot(projectPath);
+  if (!repoRoot) {
+    return {
+      available: false,
+      reason: 'This project is not inside a git repository.',
+    };
+  }
+
+  const relativeToRepo = path.relative(repoRoot, fullPath);
+  if (
+    !relativeToRepo ||
+    relativeToRepo.startsWith('..') ||
+    path.isAbsolute(relativeToRepo)
+  ) {
+    return {
+      available: false,
+      reason: 'This file is outside the git repository root.',
+    };
+  }
+
+  const relativeGitPath = relativeToRepo.split(path.sep).join('/');
+  const statusResult = runGitCommand(
+    ['status', '--porcelain', '--', relativeToRepo],
+    repoRoot,
+  );
+
+  if (statusResult.error) {
+    return { available: false, reason: statusResult.error.message };
+  }
+  if (statusResult.status !== 0) {
+    return {
+      available: false,
+      reason: (statusResult.stderr || 'Unable to inspect git state.').trim(),
+    };
+  }
+
+  const statusText = statusResult.stdout.trim();
+  const currentContent = fs.readFileSync(fullPath, 'utf-8');
+  if (!statusText) {
+    return {
+      available: true,
+      hasChanges: false,
+      baseContent: currentContent,
+      currentContent,
+      baseLabel: 'HEAD',
+      repoRoot,
+    };
+  }
+
+  if (statusText.startsWith('??')) {
+    return {
+      available: true,
+      hasChanges: true,
+      baseContent: '',
+      currentContent,
+      baseLabel: 'New file',
+      repoRoot,
+    };
+  }
+
+  const headResult = runGitCommand(
+    ['show', `HEAD:${relativeGitPath}`],
+    repoRoot,
+  );
+  if (headResult.error) {
+    return { available: false, reason: headResult.error.message };
+  }
+  if (headResult.status !== 0) {
+    return {
+      available: false,
+      reason: (
+        headResult.stderr || 'Unable to read file contents from HEAD.'
+      ).trim(),
+    };
+  }
+
+  return {
+    available: true,
+    hasChanges: true,
+    baseContent: headResult.stdout,
+    currentContent,
+    baseLabel: 'HEAD',
+    repoRoot,
+  };
+};
 
 // Initialize project from CLI argument if provided
 config.addProjectFromCLI(process.argv[2]);
@@ -190,6 +294,55 @@ const handleApiRequest = (req, res, url, pathname) => {
       });
       return;
     }
+  }
+
+  if (pathname === '/api/git-diff' && req.method === 'GET') {
+    const projectId = url.searchParams.get('projectId');
+    const filePath = url.searchParams.get('path');
+    const project = config.findProject(projectId);
+
+    if (!project) {
+      res.statusCode = 404;
+      res.end(JSON.stringify({ error: 'Project not found' }));
+      return;
+    }
+
+    if (!filePath || !isPathWithinProject(project.path, filePath)) {
+      res.statusCode = 403;
+      res.end(JSON.stringify({ error: 'Access denied' }));
+      return;
+    }
+
+    const fullPath = path.join(project.path, filePath);
+    if (!fs.existsSync(fullPath) || fs.statSync(fullPath).isDirectory()) {
+      res.statusCode = 404;
+      res.end(JSON.stringify({ error: 'File not found' }));
+      return;
+    }
+
+    const gitSnapshot = getGitFileSnapshot(project.path, fullPath);
+    if (!gitSnapshot.available) {
+      res.end(
+        JSON.stringify({
+          available: false,
+          hasChanges: false,
+          error: gitSnapshot.reason,
+        }),
+      );
+      return;
+    }
+
+    res.end(
+      JSON.stringify({
+        available: true,
+        hasChanges: gitSnapshot.hasChanges,
+        baseContent: gitSnapshot.baseContent,
+        currentContent: gitSnapshot.currentContent,
+        baseLabel: gitSnapshot.baseLabel,
+        repoRoot: gitSnapshot.repoRoot,
+      }),
+    );
+    return;
   }
 
   // Other API endpoints (projects, settings)
@@ -437,6 +590,13 @@ Mermaid Server running at http://localhost:4000
       </section>
     `;
     res.end(html(dashboardContent, 'Mermaid Server', null, ''));
+    return;
+  }
+
+  if (pathname === '/favicon.svg') {
+    res.setHeader('Connection', 'close');
+    res.setHeader('Content-Type', 'image/svg+xml');
+    fs.createReadStream(path.join(__dirname, 'favicon.svg')).pipe(res);
     return;
   }
 
