@@ -1,17 +1,22 @@
 # mermaid-md
 
-A local Node.js server for rendering Markdown files with Mermaid diagrams. Features live reload, multi-project support, and a clean reading experience.
+`mermaid-md` is a local Node.js app for browsing and editing Markdown documentation folders with Mermaid rendering built in.
 
-## Features
+It treats each documentation folder as a project root, gives you a docs-style reader UI, and watches files for live reload while you work locally.
 
-- **Mermaid Diagrams** - Renders all Mermaid diagram types (flowcharts, sequence diagrams, class diagrams, etc.)
-- **Live Reload** - Automatically refreshes when you edit your Markdown files
-- **Multi-Project** - Manage multiple documentation folders from one interface
-- **Syntax Highlighting** - Code blocks with copy-to-clipboard
-- **Table of Contents** - Auto-generated for documents with multiple headings
-- **Click to Expand** - Fullscreen view for diagrams
-- **Reading Progress** - Shows scroll progress and percentage read
-- **Inline Tooltips** - Add hover/focus explanations for key terms
+## What It Does
+
+- Render Markdown files as documentation pages
+- Render Mermaid fenced code blocks inline
+- Manage multiple documentation folders as separate projects
+- Browse a project's folder tree from the sidebar
+- Edit Markdown files in place from the browser
+- Live reload open pages when Markdown files change
+- Search within one project or across all projects
+- Add favorites for commonly visited docs
+- Generate a table of contents for longer pages
+- Show reading progress while scrolling
+- Support inline tooltips inside Markdown content
 
 ## Quick Start
 
@@ -19,9 +24,12 @@ A local Node.js server for rendering Markdown files with Mermaid diagrams. Featu
 git clone https://github.com/omnicus/mermaid-md.git
 cd mermaid-md
 npm install
+npm start
 ```
 
-## Usage
+Open `http://localhost:4000`.
+
+## Running The App
 
 Start the server:
 
@@ -29,66 +37,118 @@ Start the server:
 npm start
 ```
 
-Start the local docs project without server auto-restart:
+Start the server and automatically add the current folder as a project root:
 
 ```bash
-bun run dev
+npm run dev
 ```
 
-Start the server in watch mode so it restarts when server files change:
+Start the server in watch mode so server-side code restarts on changes:
 
 ```bash
-bun run dev:watch
+npm run dev:watch
 ```
 
-Or specify a directory to add as a project:
+Start the server and add a specific docs folder as a project root:
 
 ```bash
-node server.js /path/to/your/docs
+node server.js /path/to/docs
 ```
 
-Then open http://localhost:4000 in your browser.
+Set a custom port:
 
-## Adding Projects
+```bash
+PORT=3000 npm start
+```
 
-1. Click **+ Add Project** in the sidebar
-2. Enter a name and browse to the folder containing your Markdown files
-3. Click **Save Project**
+## How Projects Work
 
-Projects are persisted in `~/.mermaid-server.json`.
+A project in `mermaid-md` is just a folder on disk.
+
+That folder becomes the project root. The app scans it for Markdown files, builds the navigation from the folders inside it, and only allows in-browser editing for Markdown files inside that root.
+
+If you start the server with a path:
+
+```bash
+node server.js /Users/you/work/docs
+```
+
+that folder is added as a project and shown in the UI. You can also add more projects later from the app.
+
+Project definitions are persisted in `~/.mermaid-server.json`.
+
+## Recommended Project Structure
+
+There is no required schema, but the easiest setup is one folder per documentation project with Markdown files organized into subfolders.
+
+Example:
+
+```text
+product-docs/
+  README.md
+  getting-started.md
+  architecture/
+    overview.md
+    deployment.md
+  guides/
+    editing-content.md
+    diagrams.md
+  decisions/
+    adr-001.md
+```
+
+How this maps in `mermaid-md`:
+
+- `product-docs/` is the project root
+- every `.md` file inside that root is part of the project
+- subfolders become part of the sidebar navigation
+- opening a page keeps you inside that project context
+
+## Adding Projects From The UI
+
+1. Click `+ Add Project` in the sidebar.
+2. Enter a project name.
+3. Choose the folder that should act as that project's root.
+4. Save the project.
+
+## Editing And Live Reload
+
+- Markdown files can be opened and edited directly in the browser
+- Only `.md` files inside the selected project root are editable
+- When files change, connected pages for that project reload automatically
 
 ## Writing Mermaid Diagrams
 
-Add Mermaid diagrams to your Markdown files using fenced code blocks:
+Add Mermaid diagrams with fenced code blocks:
 
 ````markdown
 ```mermaid
 flowchart TD
-    A[Start] --> B{Decision}
-    B -->|Yes| C[Do something]
-    B -->|No| D[Do something else]
+  A[Start] --> B{Decision}
+  B -->|Yes| C[Do something]
+  B -->|No| D[Do something else]
 ```
 ````
 
-All [Mermaid diagram types](https://mermaid.js.org/intro/) are supported.
+All [Mermaid diagram types](https://mermaid.js.org/intro/) supported by Mermaid can be used.
 
 ## Inline Tooltips
 
-You can add tooltips directly in markdown with this syntax:
+Add inline tooltips in Markdown with this syntax:
 
 ```markdown
 {{Mandat|Bestillingen fra styret.\nEksempel: "Lag en plan som reduserer frafall i ungdomsfotballen innen oktober."}}
 ```
 
-- Hover with mouse, or tab-focus on keyboard, to show the tooltip
+- Hover with a mouse or focus with the keyboard to show the tooltip
 - Use `\n` for line breaks inside the tooltip text
-- Escape `|` as `\|` if needed inside tooltip content
+- Escape `|` as `\|` inside tooltip content when needed
 
 ## Configuration
 
 | Environment Variable | Default | Description |
-|---------------------|---------|-------------|
-| `PORT` | 4000 | Server port |
+| --- | --- | --- |
+| `PORT` | `4000` | Server port |
 
 ## License
 
