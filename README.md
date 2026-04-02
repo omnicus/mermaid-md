@@ -29,6 +29,18 @@ Start the server:
 npm start
 ```
 
+Start the local docs project without server auto-restart:
+
+```bash
+bun run dev
+```
+
+Start the server in watch mode so it restarts when server files change:
+
+```bash
+bun run dev:watch
+```
+
 Or specify a directory to add as a project:
 
 ```bash

@@ -318,7 +318,7 @@ const handleProjectRequest = (res, projectId, subPath, url) => {
       const title = getH1Title(content) || 'README.md';
       const readmeFilePath =
         subPath === '/' ? 'README.md' : path.join(subPath, 'README.md');
-      const nav = `<div class="back-link"><a href="javascript:history.back()">&larr; Back</a><span style="color:var(--border-color)">|</span><a href="?all=true">Show all files</a></div>`;
+      const nav = `<div class="back-link"><a href="javascript:history.back()">&larr; Back</a></div>`;
       res.end(
         html(
           renderMarkdown(content),
