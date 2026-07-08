@@ -61,6 +61,32 @@ Set a custom port:
 PORT=3000 npm start
 ```
 
+Run it as a background service on startup with `systemd`:
+
+1. Copy `systemd/mermaid-md.service` to `~/.config/systemd/user/mermaid-md.service`
+2. Replace `/path/to/mermaid-md` in that file with your checkout path
+3. Reload and enable the service:
+
+```bash
+systemctl --user daemon-reload
+systemctl --user enable --now mermaid-md.service
+loginctl enable-linger "$USER"
+```
+
+Check status:
+
+```bash
+systemctl --user status mermaid-md.service
+```
+
+Manage the service:
+
+```bash
+systemctl --user restart mermaid-md.service
+systemctl --user stop mermaid-md.service
+journalctl --user -u mermaid-md.service -f
+```
+
 ## How Projects Work
 
 A project in `mermaid-md` is just a folder on disk.
@@ -153,4 +179,3 @@ Add inline tooltips in Markdown with this syntax:
 ## License
 
 MIT
-

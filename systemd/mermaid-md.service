@@ -1,0 +1,14 @@
+[Unit]
+Description=Mermaid MD local web server
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/path/to/mermaid-md
+Environment=PORT=4000
+ExecStart=/usr/bin/env node /path/to/mermaid-md/server.js
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target
