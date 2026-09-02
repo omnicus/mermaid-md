@@ -114,9 +114,10 @@ product-docs/
   README.md
   getting-started.md
   architecture/
-    overview.md
+    architecture.md
     deployment.md
   guides/
+    guides.md
     editing-content.md
     diagrams.md
   decisions/
@@ -126,8 +127,11 @@ product-docs/
 How this maps in `mermaid-md`:
 
 - `product-docs/` is the project root
+- the root `README.md` becomes the project intro
+- nested `README.md` files are ordinary pages
 - every `.md` file inside that root is part of the project
 - subfolders become part of the sidebar navigation
+- a page matching its folder name becomes that folder's landing page, such as `guides/guides.md`
 - opening a page keeps you inside that project context
 
 ## Adding Projects From The UI
